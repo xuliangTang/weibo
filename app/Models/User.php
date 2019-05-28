@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Modules;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -10,12 +10,14 @@ class User extends Authenticatable
 {
     use Notifiable;
 
+    protected $table = 'users'; // 数据库表名
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
+    protected $fillable = [     // 只有包含在该属性中的字段才能够被正常更新
         'name', 'email', 'password',
     ];
 
