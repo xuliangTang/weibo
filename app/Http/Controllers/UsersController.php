@@ -8,6 +8,31 @@ use Auth;
 
 class UsersController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth', [
+           'except' => ['show', 'create', 'store', 'index']
+        ]);
+
+        $this->middleware('guest', [
+            'only' => ['create']
+        ]);
+    }
+
+    /**
+     * 用户列表页
+     */
+    public function index()
+    {
+        // $users = User::all();
+        $users = User::paginate(8);
+        return view('users.index', compact('users'));
+    }
+
+    /**
+     * 用户注册页面
+     */
     public function create()
     {
         return view('users.create');
@@ -47,6 +72,7 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
+        $this->authorize('update', $user);  // 参数一为授权策略的名称，参数二为进行授权验证的数据
         return view('users.edit', ['user'=>$user]);
     }
 
@@ -55,6 +81,7 @@ class UsersController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        $this->authorize('update', $user);  // 参数一为授权策略的名称，参数二为进行授权验证的数据
         $this->validate($request, [
             'name' => 'required|max:50',
             'password' => 'nullable|confirmed|min:6'
@@ -63,7 +90,7 @@ class UsersController extends Controller
         $data = [];
         $data['name'] = $request->name;
         if(isset($request->password) && $request->password) {
-            $data['password'] = $request->password;
+            $data['password'] = bcrypt($request->password);
         }
 
         $user->update($data);
